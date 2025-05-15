@@ -30,3 +30,4 @@ sqlparse==0.5.3
 tqdm==4.67.1
 typing_extensions==4.12.2
 urllib3==2.3.0
+gunicorn
