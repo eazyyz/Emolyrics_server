@@ -29,7 +29,7 @@ sqlparse==0.5.3
 tqdm==4.67.1
 typing_extensions==4.12.2
 urllib3==2.3.0
-lyricsgenius==2.0.7
+lyricsgenius==2.0.2
 beautifulsoup4
 requests
 gunicorn
