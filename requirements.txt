@@ -16,6 +16,7 @@ httpx==0.28.1
 idna==3.10
 image==1.5.33
 jiter==0.8.2
+lyricsgenius==3.2.0
 openai==1.63.2
 pillow==11.1.0
 pydantic==2.10.6
@@ -29,7 +30,4 @@ sqlparse==0.5.3
 tqdm==4.67.1
 typing_extensions==4.12.2
 urllib3==2.3.0
-lyricsgenius==2.0.2
-beautifulsoup4
-requests
 gunicorn
