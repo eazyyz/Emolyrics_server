@@ -30,6 +30,7 @@ def get_lyrics_view(request):
         return JsonResponse({"error": "Both 'title' and 'artist' are required."}, status=400)
 
     song_data = get_song_data(artist, title,False)
+    print(song_data)
 
     if 'error' in song_data:
         return JsonResponse({"error": song_data['error']}, status=404)
