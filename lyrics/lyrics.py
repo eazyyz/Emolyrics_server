@@ -44,6 +44,7 @@ def clean_title(title):
 def get_song_data(artist, title, force_generate):
     try:
         song = genius.search_song(title, artist)
+        print(song)
         if not song:
             print("песня не найдена, ищу схожую по названию (в поиске)")
             song = genius.search_song(f"{artist} {title}")
