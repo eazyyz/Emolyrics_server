@@ -31,6 +31,9 @@ def get_lyrics_view(request):
 
     song_data = get_song_data(artist, title,False)
 
+    if 'error' in song_data:
+        return JsonResponse({"error": song_data['error']}, status=404)
+
     # сохраняем песню в БД, если её там ещё нет
     SongDB.objects.get_or_create(
         title=song_data['title'],

@@ -1,23 +1,24 @@
 import lyricsgenius
 from django.contrib.sites import requests
 from openai import OpenAI
-import os
 import re
-from dotenv import load_dotenv
 from django.http import JsonResponse
 from django.http import StreamingHttpResponse
 import json
 import requests.exceptions
-
-
-# load_dotenv()
-# API_KEY = os.getenv("OPENROUTER_API_KEY")
+# import requests
+#
+# session = requests.Session()
+# session.proxies = {}
+#
+# # временно заменим requests внутри lyricsgenius на нашу сессию
+# lyricsgenius.api.requests = session
 
 genius = lyricsgenius.Genius("8F2nSFju1pOZDX02ESMWyB8UprXIE8h_FjbJ8s1OEmAdfLpiBJZwcVKTfXF7zcJu", timeout=10)
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key= "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",
+    api_key= "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",
 )
 # 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
 def clean_lyrics(lyrics):
@@ -58,6 +59,7 @@ def get_song_data(artist, title, force_generate):
                     enhanced_lyrics = process_lyrics_with_ai(lyrics)
                     if len(enhanced_lyrics) <= len(lyrics):
                         print('error')
+                        print(enhanced_lyrics)
                         return
                 # enhanced_lyrics = lyrics
                 enhanced_lyrics += '\n'
