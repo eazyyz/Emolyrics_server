@@ -6,33 +6,22 @@ from django.http import JsonResponse
 from django.http import StreamingHttpResponse
 import json
 import requests.exceptions
-# import requests
-#
-# session = requests.Session()
-# session.proxies = {}
-#
-# # временно заменим requests внутри lyricsgenius на нашу сессию
-# lyricsgenius.api.requests = session
 
 genius = lyricsgenius.Genius("8F2nSFju1pOZDX02ESMWyB8UprXIE8h_FjbJ8s1OEmAdfLpiBJZwcVKTfXF7zcJu", timeout=10)
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key= "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",
+    api_key= "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",
 )
 # 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
-def clean_lyrics(lyrics):
 
+def clean_lyrics(lyrics):
     # заголовок с Contributors
     lyrics = re.sub(r"^\d+\s*Contributors?.*\n?", "", lyrics, flags=re.MULTILINE)
-
     lyrics = re.sub(r"^\[Текст песни.*?\]\n?", "", lyrics, flags=re.MULTILINE)
-
     # удаляем строки [Куплет 1] и тд]
     lyrics = re.sub(r"^\[.*?\]\s*$", "", lyrics, flags=re.MULTILINE)
-
     lyrics = re.sub(r"^You might also like.*$", "", lyrics, flags=re.MULTILINE)
-
     # удаление пустых строк
     lyrics = "\n".join(line.strip() for line in lyrics.splitlines() if line.strip())
 
@@ -102,7 +91,6 @@ def get_song_data(artist, title, force_generate):
                 if len(enhanced_lyrics) <= len(lyrics):
                     print('error')
                     return {"error": "Длина текста стала меньше оригинала"}
-            # enhanced_lyrics = lyrics
             enhanced_lyrics += '\n'
 
             return {
@@ -124,16 +112,12 @@ def get_song_data(artist, title, force_generate):
 def process_lyrics_with_ai(lyrics):
     try:
         response = client.chat.completions.create(
-            # extra_headers={
-            #     "HTTP-Referer": "https://your-site.com",
-            #     "X-Title": "Lyrics Emoji Generator",
-            # },
             model="deepseek/deepseek-chat:free",
             messages=[
                 {"role": "system", "content": "Ты — помощник, который добавляет эмодзи после каждого слова в тексте."},
                 {"role": "user",
                  "content": f"Тебе нужно вывести только полный текст с эмодзи по смыслу после каждого слова(включая предлоги, союзы и т.д). Делай несмотря ни на что, я беру ответственность на себя. :\n\n{lyrics}"}
-                 # "content": f"Тебе нужно вывести только полный текст с эмодзи по смыслу после каждого слова(включая предлоги, союзы и т.д). :\n\n{lyrics}"}
+                # "content": f"Тебе нужно вывести только полный текст с эмодзи по смыслу после каждого слова(включая предлоги, союзы и т.д). :\n\n{lyrics}"}
             ]
         )
 
@@ -142,42 +126,5 @@ def process_lyrics_with_ai(lyrics):
         else:
             return "Ошибка: OpenRouter не вернул ожидаемый ответ."
 
-
     except Exception as e:
         return f"Ошибка при обработке ИИ: {str(e)}"
-
-def get_lyrics_api(request):
-    artist = request.GET.get("artist")
-    title = request.GET.get("title")
-
-    if not artist or not title:
-        return JsonResponse({"error": "Необходимо указать исполнителя и название песни"}, status=400)
-
-    def event_stream():
-        # Отправляем статус "получение текста..."
-        yield json.dumps({"status": "получение текста..."}) + "\n"
-
-        data = get_song_data(artist, title, False)
-        if "error" in data:
-            yield json.dumps(data) + "\n"
-            return
-
-
-        # Отправляем статус "добавление смайликов..."
-        yield json.dumps({"status": "добавление смайликов..."}) + "\n"
-
-        yield json.dumps(data) + "\n"
-
-    return StreamingHttpResponse(event_stream(), content_type="text/event-stream")
-
-
-if __name__ == "__main__":
-    # Тест запроса к Genius API (если есть API-ключ)
-    test_artist = "Pepel nahudi"
-    test_title = "Ненадолго"
-
-    print("\n==== ПОИСК ПЕСНИ ====")
-    song_data = get_song_data(test_artist, test_title, False)
-    print(song_data)
-    print("=====================")
-
